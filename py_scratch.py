@@ -109,7 +109,8 @@ class pgDisplay():
             self.images[name] = new_image
             self.collide_list.add(new_image)
             if transparent != 0:
-                new_image.image.set_colorkey(transparent)
+                if not img[-4:] == ".png":
+                    new_image.image.set_colorkey(transparent)
                 new_image.mask = mask.from_surface(new_image.image)
             return True
         return False
@@ -130,7 +131,7 @@ class pgDisplay():
         self.__validate_img(img)
         self.images[img].rect.y += val
         if allow == False and self.img_touching(img,"*any*"):
-            self.images[img].rect.x -= val
+            self.images[img].rect.y -= val
     def img_get_x(self,img):
         self.__validate_img(img)
         return self.images[img].rect.x
@@ -254,6 +255,8 @@ class pgDisplay():
     def __d_dobg(self):
         self.i_disp.fill(self.bgcolor)
     def __check_mouse(self):
+        if self.mouse == 0:
+            return
         for d in self.images:
             cur_img = self.__get_stretched_rect(d)
             if cur_img.collidepoint(mouse.get_pos()):
