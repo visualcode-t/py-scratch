@@ -376,6 +376,12 @@ class pgDisplay():
     def img_set_size(self,img,val):
         self.__validate_img(img)
         self.images[img].size = val
+    def img_set_x(self,img,val):
+        self.__validate_img(img)
+        self.images[img].rect.x = val
+    def img_set_y(self,img,val):
+        self.__validate_img(img)
+        self.images[img].rect.y = val
     def img_change_size(self,img,val,allow=True):
         self.__validate_img(img)
         self.images[img].size += val
