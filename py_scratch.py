@@ -389,7 +389,10 @@ class pgDisplay():
             self.img_move[img].size -=val
     def __draw_images(self):
         for d in self.images:
-            self.i_disp.blit(self.images[d].image,self.images[d].rect)
+            nloc = self.images[d].rect.copy()
+            nloc.x += self.images[d].offsetx
+            nloc.y += self.images[d].offsety
+            self.i_disp.blit(self.images[d].image,nloc)
     def __validate_img(self,img):
         if not img in self.images:
             self.__bad_message("No such image: " + img + "\nFirst call img_add_image")
@@ -414,13 +417,13 @@ class pgDisplay():
         return new_rect
     def __apply_image_effect(self,img):
         ck = self.images[img].image.get_colorkey()
-        orig_width = self.images[img].image.get_rect().width
-        orig_height = self.images[img].image.get_rect().height
+        a =  (self.images[img].base_image.get_rect())
         self.images[img].image = transform.rotate(self.images[img].base_image,self.images[img].rotation)
-        new_width = self.images[img].image.get_rect().width
-        new_height = self.images[img].image.get_rect().height
-        self.images[img].rect.x -= int((new_width - orig_width) /2)
-        self.images[img].rect.y -= int((new_height - orig_height)/2)
+        b= (self.images[img].image.get_rect())
+        wd = a.width - b.width
+        hd = a.height - b.height
+        self.images[img].offsetx = wd/2
+        self.images[img].offsety = hd/2
         if self.images[img].shade != 0:
             self.images[img].image.fill(self.images[img].shade,special_flags = BLEND_RGBA_MULT)
             self.images[img].image.set_colorkey(self.images[img].shade)
@@ -432,6 +435,8 @@ class pgSprite(sprite.Sprite):
     shade = 0
     rotation = 0
     size = 100
+    offsetx = 0
+    offsety = 0
     def __init__(self):
         super().__init__()
     def set_image(self,img,x,y):
