@@ -11,6 +11,7 @@ from copy import copy
 #Fix size
 
 #Collision:
+    ###Stretched images do not work with collision###
     #Consider sprite groups
     #Need a method of restricting movement into and through objects
     #auto-collision - Alerts similar to mouse and key
@@ -292,6 +293,7 @@ class pgDisplay():
                     if sprite.collide_mask(self.images[img1],self.images[obj]):
                         return obj
         elif img2.upper() == "*EDGE*":
+            #adjust to work with mask
             if cur_img_rect.x < 0:
                 return "Left"
             elif cur_img_rect.x + cur_img_rect.width > self.i_disp.get_width():
@@ -385,14 +387,14 @@ class pgDisplay():
     def img_change_size(self,img,val,allow=True):
         self.__validate_img(img)
         self.images[img].size += val
-        if allow == False and self.img_touching(img,"*any*"):
-            self.img_move[img].size -=val
+        self.__apply_image_effect(img)
     def __draw_images(self):
         for d in self.images:
-            nloc = self.images[d].rect.copy()
-            nloc.x += self.images[d].offsetx
-            nloc.y += self.images[d].offsety
-            self.i_disp.blit(self.images[d].image,nloc)
+            #nloc = self.images[d].rect.copy()
+            #nloc.x += self.images[d].offsetx
+            #nloc.y += self.images[d].offsety
+            #self.i_disp.blit(self.images[d].image,nloc)
+            self.i_disp.blit(self.images[d].image,self.images[d].rect)
     def __validate_img(self,img):
         if not img in self.images:
             self.__bad_message("No such image: " + img + "\nFirst call img_add_image")
@@ -417,13 +419,21 @@ class pgDisplay():
         return new_rect
     def __apply_image_effect(self,img):
         ck = self.images[img].image.get_colorkey()
-        a =  (self.images[img].base_image.get_rect())
-        self.images[img].image = transform.rotate(self.images[img].base_image,self.images[img].rotation)
+        self.images[img].image = self.images[img].base_image.copy()
+        self.images[img].image = transform.scale(self.images[img].image,(self.__get_stretched_rect(img).width,self.__get_stretched_rect(img).height))
+        a =  self.images[img].image.get_rect()
+        self.images[img].image = transform.rotate(self.images[img].image,self.images[img].rotation)
         b= (self.images[img].image.get_rect())
         wd = a.width - b.width
         hd = a.height - b.height
-        self.images[img].offsetx = wd/2
-        self.images[img].offsety = hd/2
+        ox = math.floor(wd/2)
+        oy = math.floor(hd/2)
+        self.images[img].rect.x -= self.images[img].offsetx
+        self.images[img].rect.y -= self.images[img].offsety
+        self.images[img].offsetx = ox
+        self.images[img].offsety = oy
+        self.images[img].rect.x += self.images[img].offsetx
+        self.images[img].rect.y += self.images[img].offsety
         if self.images[img].shade != 0:
             self.images[img].image.fill(self.images[img].shade,special_flags = BLEND_RGBA_MULT)
             self.images[img].image.set_colorkey(self.images[img].shade)
