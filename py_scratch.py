@@ -204,8 +204,10 @@ class pgDisplay():
         '''
         self.__validate_img(img)
         self.images[img].rect.x += val
+        output = self.img_touching(img,"*any*")
         if allow == False and self.img_touching(img,"*any*"):
             self.images[img].rect.x -= val
+        return output
     def img_move_y(self,img,val,allow=True):
         '''Change the sprite's y position..
 
@@ -216,8 +218,11 @@ class pgDisplay():
         '''
         self.__validate_img(img)
         self.images[img].rect.y += val
+        output = self.img_touching(img,"*any*")
         if allow == False and self.img_touching(img,"*any*"):
+            
             self.images[img].rect.y -= val
+        return output
     def img_get_x(self,img):
         '''Get the sprite's x position..
 
